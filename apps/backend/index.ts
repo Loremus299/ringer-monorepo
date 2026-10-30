@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { ZodValidationError } from "@nidhi/schemas";
-import { Hono } from "hono/tiny";
+import { Hono } from "hono/quick";
 import loggerMiddleware, { type AppEnv } from "./utils/strawberry";
 import { aril } from "./utils/lychee";
 import { Scalar } from "@scalar/hono-api-reference";
