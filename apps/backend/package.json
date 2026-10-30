@@ -1,0 +1,16 @@
+{
+	"name": "backend",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "bun --hot index.ts"
+	},
+	"devDependencies": {
+		"@types/node": "latest"
+	},
+	"dependencies": {
+		"@hono/node-server": "^2.1.5",
+		"hono": "^4.13.14"
+	}
+}

@@ -2,9 +2,6 @@
 	"name": "@nidhi/schemas",
 	"module": "index.ts",
 	"type": "module",
-	"peerDependencies": {
-		"typescript": "^7"
-	},
 	"dependencies": {
 		"zod": "^4.6.7"
 	}
