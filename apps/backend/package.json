@@ -11,6 +11,8 @@
 	},
 	"dependencies": {
 		"@hono/node-server": "^2.1.5",
+		"@loremus299/lychee": "^2.0.2",
+		"@loremus299/strawberry": "^1.1.0",
 		"hono": "^4.13.14"
 	}
 }
