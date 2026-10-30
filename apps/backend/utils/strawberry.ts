@@ -13,9 +13,7 @@ const loggerMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
 
 	c.set("logger", logger);
 
-	logger.info("Request", {
-		url: `${c.req.method} ${c.req.url}`,
-	});
+	logger.info("Request", `${c.req.method} ${c.req.url}`);
 
 	await next();
 

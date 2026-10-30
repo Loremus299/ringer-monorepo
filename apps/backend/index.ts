@@ -4,6 +4,13 @@ import { Hono } from "hono/quick";
 import loggerMiddleware, { type AppEnv } from "./utils/strawberry";
 import { aril } from "./utils/lychee";
 import { Scalar } from "@scalar/hono-api-reference";
+import { env } from "node:process";
+
+if (!(env.PORT && env.DATABASE_URL))
+	throw new Error(`
+MAKE SURE THE FOLLOWING ENVIRONMENT VARIABLES ARE SET
+PORT=
+DATABASE_URL=`);
 
 const app = new Hono<AppEnv>();
 app.use("*", loggerMiddleware);
@@ -19,4 +26,4 @@ app.onError((err, c) => {
 	c.var.logger.error("CRITICAL", err);
 	return c.text("Unknown & unaccounted error", 500);
 });
-serve({ fetch: app.fetch, port: 8080 });
+serve({ fetch: app.fetch, port: Number(env.PORT) });

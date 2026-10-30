@@ -5,6 +5,8 @@
 		"dev": "turbo run dev"
 	},
 	"devDependencies": {
+		"@types/pg": "^8.23.1",
+		"drizzle-kit": "^1.0.0-rc.5",
 		"turbo": "^2.11.10"
 	},
 	"engines": {
@@ -21,6 +23,7 @@
 		"packages/*"
 	],
 	"dependencies": {
+		"drizzle-orm": "^1.0.0-rc.5",
 		"typescript": "^7.0.2"
 	}
 }
