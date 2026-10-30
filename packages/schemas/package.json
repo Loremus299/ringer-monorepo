@@ -1,5 +1,5 @@
 {
-	"name": "@nidhi/schemas",
+	"name": "@ringer/schemas",
 	"module": "index.ts",
 	"type": "module",
 	"dependencies": {

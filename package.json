@@ -1,5 +1,5 @@
 {
-	"name": "nidhi-pal",
+	"name": "ringer",
 	"private": true,
 	"scripts": {
 		"dev": "turbo run dev"

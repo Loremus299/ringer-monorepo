@@ -13,7 +13,7 @@
 		"@hono/node-server": "^2.1.5",
 		"@loremus299/lychee": "^2.0.2",
 		"@loremus299/strawberry": "^1.1.0",
-		"@nidhi/schemas": "workspace:*",
+		"@ringer/schemas": "workspace:*",
 		"@scalar/hono-api-reference": "^0.12.17",
 		"hono": "^4.13.14"
 	}
