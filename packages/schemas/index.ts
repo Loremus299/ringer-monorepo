@@ -1,10 +1,15 @@
-import type { ZodType } from "zod";
+import { z, type ZodType } from "zod";
 
 export class ZodValidationError {
 	public constructor(
 		public readonly error: { path: PropertyKey[]; message: string }[],
 	) {}
 }
+
+export const zod400 = z.object({
+	path: z.array(z.any()),
+	error: z.any(),
+});
 
 export default function zodValidate<Z extends ZodType>(
 	schema: Z,
