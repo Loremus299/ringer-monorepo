@@ -21,7 +21,12 @@ app.route("", authRouter);
 app.get("/openapi", (c) => c.json(aril.docs));
 app.use(
 	"/",
-	Scalar({ url: "/openapi", theme: "elysiajs", showOperationId: true }),
+	Scalar({
+		url: "/openapi",
+		theme: "elysiajs",
+		showOperationId: true,
+		showDeveloperTools: "never",
+	}),
 );
 
 app.onError((err, c) => {
