@@ -1,5 +1,5 @@
 import { Aril } from "@loremus299/lychee";
-import { zod400 } from "@nidhi/schemas";
+import { zod400 } from "@ringer/schemas";
 
 export const aril = new Aril("3.0.0", {
 	title: "Ringer",
