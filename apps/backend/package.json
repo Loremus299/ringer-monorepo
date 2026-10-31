@@ -7,7 +7,8 @@
 		"dev": "bun --hot index.ts"
 	},
 	"devDependencies": {
-		"@types/node": "latest"
+		"@types/node": "latest",
+		"@types/pg": "^8.23.1"
 	},
 	"dependencies": {
 		"@hono/node-server": "^2.1.5",
@@ -16,6 +17,7 @@
 		"@loremus299/strawberry": "^1.1.0",
 		"@ringer/schemas": "workspace:*",
 		"@scalar/hono-api-reference": "^0.12.17",
-		"hono": "^4.13.14"
+		"hono": "^4.13.14",
+		"pg": "^8.23.1"
 	}
 }
