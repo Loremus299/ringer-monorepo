@@ -6,6 +6,7 @@ import { aril } from "./utils/lychee";
 import { Scalar } from "@scalar/hono-api-reference";
 import { env } from "node:process";
 import { authRouter } from "./routes/auth";
+import { cors } from "hono/cors";
 
 if (!(env.PORT && env.DATABASE_URL))
 	throw new Error(`
@@ -14,6 +15,7 @@ PORT=
 DATABASE_URL=`);
 
 const app = new Hono<AppEnv>();
+app.use("*", cors());
 app.use("*", loggerMiddleware);
 
 app.route("", authRouter);

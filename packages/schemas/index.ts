@@ -43,10 +43,11 @@ export const genericOk = z.string();
 export const badFaithError = z.string();
 
 export const createUserBody = z.object({
-	name: z.string().min(6).max(50),
+	name: z.string().min(3).max(50),
 	email: z.email(),
 	password: z.string().refine((t) => zxcvbn(t).score >= 3, "Weak password"),
 });
+export type CreateUserBody = z.infer<typeof createUserBody>;
 
 export const createSessionHeader = z.object({
 	"user-agent": z.string(),
