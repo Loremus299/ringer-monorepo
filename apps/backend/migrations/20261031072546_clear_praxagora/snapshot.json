@@ -1,0 +1,44 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "617730aa-e2a3-4a2b-a87a-3f2e532286a9",
+  "prevIds": [
+    "01b29e0f-874c-47fa-9c00-399c4f442be5"
+  ],
+  "footprints": [
+    {
+      "statementType": "recreate_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "sessions"
+      ],
+      "writes": [
+        "s|fk|public.sessions.sessions_session_owner_users_id_fkey",
+        "n|fk|public.sessions.sessions_session_owner_users_id_fkey",
+        "e|fk|public.sessions.sessions_session_owner_users_id_fkey",
+        "n|con|public.sessions.sessions_session_owner_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.sessions",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.sessions.session_owner",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ],
+      "sqlHash": "41d194a2a4a15178"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "alter",
+      "key": "fks\u0000[\"public\",\"sessions\",\"sessions_session_owner_users_id_fkey\"]",
+      "set": {
+        "onDelete": "CASCADE"
+      }
+    }
+  ]
+}
