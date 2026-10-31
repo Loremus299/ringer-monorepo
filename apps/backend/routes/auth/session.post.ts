@@ -13,6 +13,7 @@ import { sessionTable, userTable } from "../../utils/db/schema";
 import { eq } from "drizzle-orm";
 import Result, { NoRows } from "@loremus299/pineapple";
 import * as argon2 from "argon2";
+import { createHash } from "node:crypto";
 
 const route = authDocs.path("/session", "post", {
 	summary: "Create Session",
@@ -112,17 +113,7 @@ const createSession = action(async ({ body, header }, log: Logger) => {
 
 	log.debug("op", "hashed token for session");
 	const token = globalThis.crypto.randomUUID();
-	const tokenHashRes = await Result.tryCatch(() => argon2.hash(token));
-	if (!tokenHashRes.outcome.success) {
-		log.error("server error", tokenHashRes.outcome.error as string);
-		return {
-			"500": {
-				error: "Internal Server Error - Failed to create a safe session token",
-				"request-id": log.id,
-			},
-		};
-	}
-	const tokenHash = tokenHashRes.outcome.data;
+	const tokenHash = createHash("sha256").update(token).digest("hex");
 
 	log.debug("op", "create session");
 	const q2 = await Result.tryCatch(async () => {

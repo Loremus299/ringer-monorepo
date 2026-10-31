@@ -36,6 +36,7 @@ export const genericError = z.object({
 	error: z.string(),
 	"request-id": z.uuidv4(),
 });
+export type GenericError = z.infer<typeof genericError>;
 
 export const genericOk = z.string();
 
@@ -57,3 +58,7 @@ export const createSessionBody = z.object({
 });
 
 export const createSessionOk = z.uuidv4();
+
+export const authMiddlewareCookies = z.object({
+	authorization: z.string().startsWith("Bearer ").length(39),
+});
