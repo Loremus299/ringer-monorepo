@@ -3,6 +3,10 @@
 	"module": "index.ts",
 	"type": "module",
 	"dependencies": {
-		"zod": "^4.6.7"
+		"zod": "^4.6.7",
+		"zxcvbn": "^4.4.2"
+	},
+	"devDependencies": {
+		"@types/zxcvbn": "^4.4.5"
 	}
 }

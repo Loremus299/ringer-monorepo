@@ -1,15 +1,20 @@
 import { z, type ZodType } from "zod";
+import zxcvbn from "zxcvbn";
 
-export class ZodValidationError {
+export class ZodValidationError extends Error {
 	public constructor(
 		public readonly error: { path: PropertyKey[]; message: string }[],
-	) {}
+	) {
+		super("Validation failed");
+		this.name = "ZodValidationError";
+	}
 }
-
-export const zod400 = z.object({
-	path: z.array(z.any()),
-	message: z.string(),
-});
+export const zod400 = z.array(
+	z.object({
+		path: z.array(z.any()),
+		message: z.string(),
+	}),
+);
 
 export default function zodValidate<Z extends ZodType>(
 	schema: Z,
@@ -26,3 +31,16 @@ export default function zodValidate<Z extends ZodType>(
 	}
 	return data.data;
 }
+
+export const genericError = z.object({
+	error: z.string(),
+	"request-id": z.uuidv4(),
+});
+
+export const genericOk = z.string();
+
+export const createUserBody = z.object({
+	name: z.string().min(6).max(50),
+	email: z.email(),
+	password: z.string().refine((t) => zxcvbn(t).score >= 3, "Weak password"),
+});

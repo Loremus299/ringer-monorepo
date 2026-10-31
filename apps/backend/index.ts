@@ -5,6 +5,7 @@ import loggerMiddleware, { type AppEnv } from "./utils/strawberry";
 import { aril } from "./utils/lychee";
 import { Scalar } from "@scalar/hono-api-reference";
 import { env } from "node:process";
+import { authRouter } from "./routes/auth";
 
 if (!(env.PORT && env.DATABASE_URL))
 	throw new Error(`
@@ -14,6 +15,8 @@ DATABASE_URL=`);
 
 const app = new Hono<AppEnv>();
 app.use("*", loggerMiddleware);
+
+app.route("", authRouter);
 
 app.get("/openapi", (c) => c.json(aril.docs));
 app.use("/", Scalar({ url: "/openapi", theme: "elysiajs" }));

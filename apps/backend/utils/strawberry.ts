@@ -1,3 +1,4 @@
+import Result from "@loremus299/pineapple";
 import Strawberry from "@loremus299/strawberry";
 import type { MiddlewareHandler } from "hono";
 
@@ -15,7 +16,7 @@ const loggerMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
 
 	logger.info("Request", `${c.req.method} ${c.req.url}`);
 
-	await next();
+	await Result.tryCatch(async () => await next());
 
 	logger.info("Response", {
 		status: c.res.status,

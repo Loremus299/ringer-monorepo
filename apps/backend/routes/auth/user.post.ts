@@ -1,0 +1,69 @@
+import { createUserBody, genericError, genericOk } from "@ringer/schemas";
+import { authDocs } from "./docs";
+import type Logger from "@loremus299/strawberry";
+import Result, { NoRows } from "@loremus299/pineapple";
+import db from "../../utils/db";
+import { userTable } from "../../utils/db/schema";
+import * as argon2 from "argon2";
+
+const route = authDocs.path("/user", "post", {
+	summary: "Create user",
+	description: "Create user with preferred name, email and password",
+	operationId: "auth-create-user",
+	tags: ["Auth"],
+});
+
+const def = route.documentFunction({
+	body: {
+		type: "application/json",
+		zod: createUserBody,
+		description: "Preferred name, email, password",
+		required: true,
+	},
+	responses: {
+		201: { type: "text/plain", description: "Nice message :3", zod: genericOk },
+		409: {
+			type: "application/json",
+			description: "Email already registered",
+			zod: genericError,
+		},
+		500: {
+			type: "application/json",
+			description: "Internal Server Error",
+			zod: genericError,
+		},
+	},
+});
+
+const createUser = def(async ({ body }, log: Logger) => {
+	log.trace("body", { ...body, password: "REDACTED" });
+
+	log.debug("op", "hashing password");
+	const hashedPassword = await argon2.hash(body.password);
+
+	log.debug("op", "create user query");
+	const q = (
+		await Result.tryCatch(async () =>
+			db
+				.insert(userTable)
+				.values({ ...body, password: hashedPassword })
+				.onConflictDoNothing()
+				.returning(),
+		)
+	)
+		.one()
+		.mapError((e) => (e === NoRows ? "conflict" : e));
+
+	if (!q.outcome.success) {
+		if (q.outcome.error == "conflict")
+			return {
+				"409": { error: "Email already registered", "request-id": log.id },
+			};
+		log.error("server error", q.outcome.error as string);
+		return { "500": { error: "Internal Server Error", "request-id": log.id } };
+	}
+
+	return { "201": "user account created successfully" };
+});
+
+export default createUser;
