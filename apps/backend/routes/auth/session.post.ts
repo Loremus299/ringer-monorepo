@@ -1,4 +1,10 @@
-import { createSessionBody, genericError, genericOk } from "@ringer/schemas";
+import {
+	badFaithError,
+	createSessionBody,
+	createSessionOk,
+	genericError,
+	genericOk,
+} from "@ringer/schemas";
 import { authDocs } from "./docs";
 import type Logger from "@loremus299/strawberry";
 import db from "../../utils/db";
@@ -25,17 +31,17 @@ const action = route.documentFunction({
 		201: {
 			type: "text/plain",
 			description: "Session token, also set in cookie",
-			zod: genericOk,
+			zod: createSessionOk,
 		},
 		404: {
 			type: "application/json",
 			description: "Wrong password",
-			zod: genericError,
+			zod: badFaithError,
 		},
 		401: {
 			type: "text/plain",
 			description: "Incorrect password",
-			zod: genericError,
+			zod: badFaithError,
 		},
 		500: {
 			type: "applicaiton/json",
@@ -60,10 +66,7 @@ const createSession = action(async ({ body }, log: Logger) => {
 	if (!q.outcome.success) {
 		if (q.outcome.error == "no user")
 			return {
-				"404": {
-					error: "User with this email address doesn't exist",
-					"request-id": log.id,
-				},
+				"404": "User with this email address does not exist",
 			};
 		log.error("server error", q.outcome.error as string);
 		return {
@@ -76,13 +79,14 @@ const createSession = action(async ({ body }, log: Logger) => {
 	const password = q.outcome.data.password;
 	const user = q.outcome.data.id;
 	const failedAttempts = q.outcome.data.pastFailedAttempts;
+	log.debug("useful to know", { user, failedAttempts });
 
 	log.debug("op", "password verification");
 	const verify = await Result.tryCatch(() =>
-		argon2.verify(body.password, password),
+		argon2.verify(password, body.password),
 	);
 	if (!verify.outcome.success) {
-		log.error("server error", verify.outcome.error as string);
+		log.error("server error", verify.outcome.error);
 		return {
 			"500": {
 				error: "Internal Server Error - Failed to verify password",
@@ -101,7 +105,7 @@ const createSession = action(async ({ body }, log: Logger) => {
 					.where(eq(userTable.id, user)),
 			)
 		).onError((e) => log.error("server error", e as string));
-		return { "401": { error: "Incorrect password", "request-id": log.id } };
+		return { "401": "Incorrect password" };
 	}
 
 	log.debug("op", "hashed token for session");
@@ -121,8 +125,9 @@ const createSession = action(async ({ body }, log: Logger) => {
 	log.debug("op", "create session");
 	const q2 = await Result.tryCatch(async () => {
 		await db.transaction(async (tx) => {
-			tx.insert(sessionTable).values({ token: tokenHash, user });
-			tx.update(userTable)
+			await tx.insert(sessionTable).values({ token: tokenHash, user });
+			await tx
+				.update(userTable)
 				.set({ pastFailedAttempts: 0 })
 				.where(eq(userTable.id, user));
 		});

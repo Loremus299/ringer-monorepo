@@ -1,4 +1,9 @@
-import { createUserBody, genericError, genericOk } from "@ringer/schemas";
+import {
+	badFaithError,
+	createUserBody,
+	genericError,
+	genericOk,
+} from "@ringer/schemas";
 import { authDocs } from "./docs";
 import type Logger from "@loremus299/strawberry";
 import Result, { NoRows } from "@loremus299/pineapple";
@@ -25,7 +30,7 @@ const action = route.documentFunction({
 		409: {
 			type: "application/json",
 			description: "Email already registered",
-			zod: genericError,
+			zod: badFaithError,
 		},
 		500: {
 			type: "application/json",
@@ -56,7 +61,7 @@ const createUser = action(async ({ body }, log: Logger) => {
 		await Result.tryCatch(() =>
 			db
 				.insert(userTable)
-				.values({ ...body, password: hp })
+				.values({ ...body, password: hp, pastFailedAttempts: 0 })
 				.onConflictDoNothing()
 				.returning(),
 		)
@@ -67,7 +72,7 @@ const createUser = action(async ({ body }, log: Logger) => {
 	if (!q.outcome.success) {
 		if (q.outcome.error == "conflict")
 			return {
-				"409": { error: "Email already registered", "request-id": log.id },
+				"409": "Email is already registered",
 			};
 		log.error("server error", q.outcome.error as string);
 		return {

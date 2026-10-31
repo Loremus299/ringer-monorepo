@@ -39,6 +39,8 @@ export const genericError = z.object({
 
 export const genericOk = z.string();
 
+export const badFaithError = z.string();
+
 export const createUserBody = z.object({
 	name: z.string().min(6).max(50),
 	email: z.email(),
@@ -47,5 +49,7 @@ export const createUserBody = z.object({
 
 export const createSessionBody = z.object({
 	email: z.email(),
-	password: z.string(),
+	password: z.string().min(1),
 });
+
+export const createSessionOk = z.uuidv4();

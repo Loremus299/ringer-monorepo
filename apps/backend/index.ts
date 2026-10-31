@@ -19,7 +19,10 @@ app.use("*", loggerMiddleware);
 app.route("", authRouter);
 
 app.get("/openapi", (c) => c.json(aril.docs));
-app.use("/", Scalar({ url: "/openapi", theme: "elysiajs" }));
+app.use(
+	"/",
+	Scalar({ url: "/openapi", theme: "elysiajs", showOperationId: true }),
+);
 
 app.onError((err, c) => {
 	if (err instanceof ZodValidationError) {
