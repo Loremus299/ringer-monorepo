@@ -1,11 +1,12 @@
 "use client";
 
+import errorPage from "@/app/error/error";
 import FormController from "@/components/badcn/formController";
 import LoadingButton from "@/components/badcn/loadingButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateUserBody, createUserBody } from "@ringer/schemas";
+import { CreateUserBody, createUserBody, GenericError } from "@ringer/schemas";
 import { Eye, EyeClosed, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -25,7 +26,23 @@ export default function RegisterForm() {
 			},
 			body: JSON.stringify(values),
 		});
-		if (createUser.status == 409) {
+		if (createUser.status == 409)
+			return errorPage({
+				status: "409",
+				error:
+					"This email is already registered with Ringer. You have to login.",
+				goto: "/auth/login",
+				buttonName: "Login",
+			});
+		if (createUser.status == 500) {
+			const body = (await createUser.json()) as GenericError;
+			return errorPage({
+				status: "500",
+				error: "Critical server error, please report this on Github",
+				id: body["request-id"],
+				goto: "https://github.com/Loremus299/ringer-monorepo/issues",
+				buttonName: "Github issues",
+			});
 		}
 	};
 
@@ -82,7 +99,11 @@ export default function RegisterForm() {
 					</div>
 				)}
 			/>
-			<LoadingButton className={"mt-2 text-background"} type="submit">
+			<LoadingButton
+				className={"mt-2 text-background"}
+				type="submit"
+				loading={form.formState.isSubmitting}
+			>
 				<UserPlus />
 				sudo adduser
 			</LoadingButton>
