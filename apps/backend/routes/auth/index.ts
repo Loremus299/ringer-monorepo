@@ -7,6 +7,8 @@ import { Hono } from "hono/tiny";
 import createUser from "./user.post";
 import type { AppEnv } from "../../utils/strawberry";
 import createSession from "./session.post";
+import authMiddleware from "../../middlewares/authentication";
+import getSession from "./get.session";
 
 export const authRouter = new Hono<AppEnv>().basePath("/auth");
 authRouter.post("/user", async (c) => {
@@ -24,4 +26,14 @@ authRouter.post("/session", async (c) => {
 	if (401 in action) return c.text(action[401], 401);
 	if (404 in action) return c.text(action[404], 404);
 	if (201 in action) return c.text(action[201], 201);
+});
+authRouter.get("/session", authMiddleware, async (c) => {
+	const action = await getSession(
+		{},
+		c.var.user.id,
+		c.var.session.token,
+		c.var.logger,
+	);
+	if (500 in action) return c.json(action[500], 500);
+	if (200 in action) return c.json(action[200], 200);
 });

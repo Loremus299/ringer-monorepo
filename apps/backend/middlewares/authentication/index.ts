@@ -53,13 +53,33 @@ const authMiddleware: MiddlewareHandler<AuthEnv> = async (c, next) => {
 			500,
 		);
 	}
+
 	const user = q.outcome.data.user;
 	const session = q.outcome.data.session;
+
+	if (session.expirationTime.getTime() < Date.now()) {
+		(
+			await Result.tryCatch(() =>
+				db.delete(sessionTable).where(eq(sessionTable.id, session.id)),
+			)
+		).onError((e) =>
+			c.var.logger.error("failed to delete an expired session", e),
+		);
+		return c.json<GenericError>(
+			{
+				error: "Session token epxired",
+				"request-id": c.var.logger.id,
+			},
+			401,
+		);
+	}
 
 	c.set("user", user);
 	c.set("session", session);
 
-	await next();
+	(await Result.tryCatch(() => next())).onError((e) =>
+		c.var.logger.error("bruh", e as string),
+	);
 };
 
 export default authMiddleware;

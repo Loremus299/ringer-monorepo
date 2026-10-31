@@ -60,5 +60,15 @@ export const createSessionBody = z.object({
 export const createSessionOk = z.uuidv4();
 
 export const authMiddlewareCookies = z.object({
-	authorization: z.string().startsWith("Bearer ").length(39),
+	authorization: z.string().startsWith("Bearer ").min(32),
 });
+
+export const getSessionOk = z.array(
+	z.object({
+		id: z.uuidv4(),
+		userAgent: z.string(),
+		createdAt: z.string(),
+		expirationTime: z.string(),
+		current: z.boolean(),
+	}),
+);

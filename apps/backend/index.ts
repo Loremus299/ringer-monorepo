@@ -34,7 +34,16 @@ app.onError((err, c) => {
 		c.var.logger.warn("failed validation", err.error);
 		return c.json(err.error, 400);
 	}
-	c.var.logger.error("CRITICAL", err);
+	c.var.logger.error(
+		"CRITICAL",
+		err instanceof Error ? (err.stack ?? err.message) : String(err),
+	);
 	return c.text("Unknown & unaccounted error", 500);
 });
+aril.servers([
+	{
+		url: `http://localhost:${env.PORT}`,
+		description: "Local Development Server",
+	},
+]);
 serve({ fetch: app.fetch, port: Number(env.PORT) });
