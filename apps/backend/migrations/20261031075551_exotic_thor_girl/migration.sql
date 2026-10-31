@@ -1,0 +1,1 @@
+ALTER TABLE "sessions" ADD COLUMN "session_user_agent" text NOT NULL;

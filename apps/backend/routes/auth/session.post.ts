@@ -1,6 +1,7 @@
 import {
 	badFaithError,
 	createSessionBody,
+	createSessionHeader,
 	createSessionOk,
 	genericError,
 	genericOk,
@@ -27,6 +28,7 @@ const action = route.documentFunction({
 		description: "Email and password",
 		required: true,
 	},
+	header: createSessionHeader,
 	responses: {
 		201: {
 			type: "text/plain",
@@ -51,7 +53,7 @@ const action = route.documentFunction({
 	},
 });
 
-const createSession = action(async ({ body }, log: Logger) => {
+const createSession = action(async ({ body, header }, log: Logger) => {
 	log.trace("action", { ...body, password: "REDACTED" });
 
 	log.debug("op", "check user existence");
@@ -125,7 +127,9 @@ const createSession = action(async ({ body }, log: Logger) => {
 	log.debug("op", "create session");
 	const q2 = await Result.tryCatch(async () => {
 		await db.transaction(async (tx) => {
-			await tx.insert(sessionTable).values({ token: tokenHash, user });
+			await tx
+				.insert(sessionTable)
+				.values({ token: tokenHash, user, userAgent: header["user-agent"] });
 			await tx
 				.update(userTable)
 				.set({ pastFailedAttempts: 0 })

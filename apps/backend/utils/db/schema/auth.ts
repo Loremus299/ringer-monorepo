@@ -28,6 +28,7 @@ export const sessionTable = pgTable("sessions", {
 		.references(() => userTable.id, { onDelete: "cascade" })
 		.notNull(),
 	token: text("session_token").notNull(),
+	userAgent: text("session_user_agent").notNull(),
 
 	createdAt: timestamp("created_at")
 		.$defaultFn(() => new Date())

@@ -1,5 +1,6 @@
 import zodValidate, {
 	createSessionBody,
+	createSessionHeader,
 	createUserBody,
 } from "@ringer/schemas";
 import { Hono } from "hono/tiny";
@@ -17,7 +18,8 @@ authRouter.post("/user", async (c) => {
 });
 authRouter.post("/session", async (c) => {
 	const body = zodValidate(createSessionBody, await c.req.json());
-	const action = await createSession({ body }, c.var.logger);
+	const header = zodValidate(createSessionHeader, c.req.header());
+	const action = await createSession({ body, header }, c.var.logger);
 	if (500 in action) return c.json(action[500], 500);
 	if (401 in action) return c.text(action[401], 401);
 	if (404 in action) return c.text(action[404], 404);
