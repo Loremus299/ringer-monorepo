@@ -19,6 +19,7 @@
       "dependencies": {
         "@hono/node-server": "^2.1.5",
         "@loremus299/lychee": "^2.0.2",
+        "@loremus299/pineapple": "^1.0.2",
         "@loremus299/strawberry": "^1.1.0",
         "@ringer/schemas": "workspace:*",
         "@scalar/hono-api-reference": "^0.12.17",
@@ -39,6 +40,8 @@
     "@hono/node-server": ["@hono/node-server@2.1.5", "", { "peerDependencies": { "hono": "^4 || ^5.0.0-0" } }, "sha512-MgP/I06GdvsilDspMk/qmRzpk8LOUStP6jFAbSRi40W09DhoyUn+Mj7eyKICPqeYKybOjVFLVIAQzvu1bfIa7Q=="],
 
     "@loremus299/lychee": ["@loremus299/lychee@2.0.2", "", { "dependencies": { "tsdown": "^0.23.1", "typescript": "^7.0.2", "zod": "^4.6.7" } }, "sha512-DbWFZEULlGVL2sOXviZfVWDN0n9MqJ6z9p1NRg2rVb/iuKA8ZxUjxVd0za/L7A+bF0nu8zDvhE+0xTlGsuXXcQ=="],
+
+    "@loremus299/pineapple": ["@loremus299/pineapple@1.0.2", "", {}, "sha512-mUPbYjG8AJMwqomKZ6EX/NNmKXzPB8DflUu9UMVK9siybZ/nITxtZQD2pLJ61mgWGM0lnxkFcqmrJclD2jLxOg=="],
 
     "@loremus299/strawberry": ["@loremus299/strawberry@1.1.0", "", {}, "sha512-TUaYiimgqzzzHfQBOMEsRwEn/VlLQPe37Z4+UZIDvgZ9w6cHwtf3pcnE/K+zsAOlad8VyL24WyfAnMpINnnDzw=="],
 
