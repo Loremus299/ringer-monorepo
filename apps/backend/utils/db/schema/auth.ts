@@ -14,3 +14,19 @@ export const userTable = pgTable("users", {
 		.$defaultFn(() => new Date())
 		.$onUpdateFn(() => new Date()),
 });
+
+export const sessionTable = pgTable("sessions", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => globalThis.crypto.randomUUID()),
+
+	user: text("session_owner")
+		.references(() => userTable.id)
+		.notNull(),
+	token: text("session_token").notNull(),
+
+	createdAt: timestamp("created_at").$defaultFn(() => new Date()),
+	expirationTime: timestamp("session_expiration").$defaultFn(
+		() => new Date(Date.now() + 24 * 60 * 60 * 1000),
+	),
+});
