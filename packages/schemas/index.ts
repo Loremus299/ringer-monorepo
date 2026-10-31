@@ -8,7 +8,7 @@ export class ZodValidationError {
 
 export const zod400 = z.object({
 	path: z.array(z.any()),
-	error: z.any(),
+	message: z.string(),
 });
 
 export default function zodValidate<Z extends ZodType>(
