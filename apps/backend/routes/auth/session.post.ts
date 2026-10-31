@@ -4,7 +4,6 @@ import {
 	createSessionHeader,
 	createSessionOk,
 	genericError,
-	genericOk,
 } from "@ringer/schemas";
 import { authDocs } from "./docs";
 import type Logger from "@loremus299/strawberry";
