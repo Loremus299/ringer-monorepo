@@ -44,3 +44,8 @@ export const createUserBody = z.object({
 	email: z.email(),
 	password: z.string().refine((t) => zxcvbn(t).score >= 3, "Weak password"),
 });
+
+export const createSessionBody = z.object({
+	email: z.email(),
+	password: z.string(),
+});

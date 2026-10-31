@@ -13,7 +13,7 @@ const route = authDocs.path("/user", "post", {
 	tags: ["Auth"],
 });
 
-const def = route.documentFunction({
+const action = route.documentFunction({
 	body: {
 		type: "application/json",
 		zod: createUserBody,
@@ -35,18 +35,28 @@ const def = route.documentFunction({
 	},
 });
 
-const createUser = def(async ({ body }, log: Logger) => {
-	log.trace("body", { ...body, password: "REDACTED" });
+const createUser = action(async ({ body }, log: Logger) => {
+	log.trace("action", { ...body, password: "REDACTED" });
 
 	log.debug("op", "hashing password");
-	const hashedPassword = await argon2.hash(body.password);
+	const hashedPassword = await Result.tryCatch(() =>
+		argon2.hash(body.password),
+	);
+	if (!hashedPassword.outcome.success)
+		return {
+			"500": {
+				error: "Internal Server Error - Failed to hash password",
+				"request-id": log.id,
+			},
+		};
 
+	const hp = hashedPassword.outcome.data;
 	log.debug("op", "create user query");
 	const q = (
-		await Result.tryCatch(async () =>
+		await Result.tryCatch(() =>
 			db
 				.insert(userTable)
-				.values({ ...body, password: hashedPassword })
+				.values({ ...body, password: hp })
 				.onConflictDoNothing()
 				.returning(),
 		)
@@ -60,10 +70,15 @@ const createUser = def(async ({ body }, log: Logger) => {
 				"409": { error: "Email already registered", "request-id": log.id },
 			};
 		log.error("server error", q.outcome.error as string);
-		return { "500": { error: "Internal Server Error", "request-id": log.id } };
+		return {
+			"500": {
+				error: "Internal Server Error - Failed to create user",
+				"request-id": log.id,
+			},
+		};
 	}
 
-	return { "201": "user account created successfully" };
+	return { "201": "Successfully created user account" };
 });
 
 export default createUser;
