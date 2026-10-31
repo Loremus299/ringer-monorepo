@@ -37,7 +37,7 @@ const action = route.documentFunction({
 		},
 		404: {
 			type: "application/json",
-			description: "Wrong password",
+			description: "User does not exist",
 			zod: badFaithError,
 		},
 		401: {
