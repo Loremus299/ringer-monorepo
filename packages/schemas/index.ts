@@ -57,6 +57,7 @@ export const createSessionBody = z.object({
 	email: z.email(),
 	password: z.string().min(1),
 });
+export type CreateSessionBody = z.infer<typeof createSessionBody>;
 
 export const createSessionOk = z.uuidv4();
 

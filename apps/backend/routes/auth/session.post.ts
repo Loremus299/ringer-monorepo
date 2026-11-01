@@ -46,7 +46,7 @@ const action = route.documentFunction({
 			zod: badFaithError,
 		},
 		500: {
-			type: "applicaiton/json",
+			type: "application/json",
 			description: "Internal Server Error",
 			zod: genericError,
 		},

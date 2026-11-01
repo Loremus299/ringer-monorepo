@@ -9,6 +9,7 @@ import type { AppEnv } from "../../utils/strawberry";
 import createSession from "./session.post";
 import authMiddleware from "../../middlewares/authentication";
 import getSession from "./get.session";
+import { setCookie } from "hono/cookie";
 
 export const authRouter = new Hono<AppEnv>().basePath("/auth");
 authRouter.post("/user", async (c) => {
@@ -25,7 +26,16 @@ authRouter.post("/session", async (c) => {
 	if (500 in action) return c.json(action[500], 500);
 	if (401 in action) return c.text(action[401], 401);
 	if (404 in action) return c.text(action[404], 404);
-	if (201 in action) return c.text(action[201], 201);
+	if (201 in action) {
+		setCookie(c, "session", action[201], {
+			httpOnly: true,
+			secure: true,
+			sameSite: "Lax",
+			path: "/",
+			maxAge: 60 * 60 * 24,
+		});
+		return c.text(action[201], 201);
+	}
 });
 authRouter.get("/session", authMiddleware, async (c) => {
 	const action = await getSession(

@@ -67,7 +67,7 @@ const authMiddleware: MiddlewareHandler<AuthEnv> = async (c, next) => {
 		);
 		return c.json<GenericError>(
 			{
-				error: "Session token epxired",
+				error: "Session token expired",
 				"request-id": c.var.logger.id,
 			},
 			401,
