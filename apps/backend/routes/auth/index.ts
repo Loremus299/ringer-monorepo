@@ -27,7 +27,7 @@ authRouter.post("/session", async (c) => {
 	if (401 in action) return c.text(action[401], 401);
 	if (404 in action) return c.text(action[404], 404);
 	if (201 in action) {
-		setCookie(c, "session", action[201], {
+		setCookie(c, "session", `Bearer ${action[201]}`, {
 			httpOnly: true,
 			secure: true,
 			sameSite: "Lax",
