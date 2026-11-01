@@ -5,8 +5,8 @@ import Image from "next/image";
 export default function Page() {
 	return (
 		<UIContainer>
-			<div className="w-full h-full grid grid-cols-2">
-				<div className="border-r"></div>
+			<div className="w-full h-full grid grid-cols-2 portrait:grid-cols-1">
+				<div className="border-r portrait:hidden"></div>
 				<div className="grid place-items-center">
 					<main className="grid gap-5">
 						<div className="flex items-center gap-3">

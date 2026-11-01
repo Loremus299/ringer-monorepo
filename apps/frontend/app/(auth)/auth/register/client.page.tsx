@@ -8,10 +8,13 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateUserBody, createUserBody, GenericError } from "@ringer/schemas";
 import { Eye, EyeClosed, UserPlus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function RegisterForm() {
+	const router = useRouter();
 	const [showPassword, setShowPassword] = useState(false);
 	const form = useForm({
 		resolver: zodResolver(createUserBody),
@@ -44,6 +47,41 @@ export default function RegisterForm() {
 				buttonName: "Github issues",
 			});
 		}
+
+		const createSession = await fetch("http://localhost:8080/auth/session", {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(values),
+		});
+		if (createSession.status == 401)
+			return errorPage({
+				status: "401",
+				error: "Critical server error, please report this on Github",
+				goto: "https://github.com/Loremus299/ringer-monorepo/issues",
+				buttonName: "Github issues",
+			});
+		if (createSession.status == 404)
+			return errorPage({
+				status: "404",
+				error: "Critical server error, please report this on Github",
+				goto: "https://github.com/Loremus299/ringer-monorepo/issues",
+				buttonName: "Github issues",
+			});
+		if (createSession.status == 500) {
+			const body = (await createSession.json()) as GenericError;
+			return errorPage({
+				status: "500",
+				error: "Critical server error, please report this on Github",
+				id: body["request-id"],
+				goto: "https://github.com/Loremus299/ringer-monorepo/issues",
+				buttonName: "Github issues",
+			});
+		}
+
+		return router.push("/");
 	};
 
 	return (
@@ -107,6 +145,9 @@ export default function RegisterForm() {
 				<UserPlus />
 				sudo adduser
 			</LoadingButton>
+			<Link href="/auth/login" className="text-sm text-muted-foreground">
+				Already have an account ? Login here
+			</Link>
 		</form>
 	);
 }
