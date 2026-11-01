@@ -44,9 +44,10 @@ const createUser = action(async ({ body }, log: Logger) => {
 	log.trace("action", { ...body, password: "REDACTED" });
 
 	log.debug("op", "hashing password");
-	const hashedPassword = await Result.tryCatch(() =>
-		argon2.hash(body.password),
-	);
+	const hashedPassword = (
+		await Result.tryCatch(() => argon2.hash(body.password))
+	).onError((e) => log.error("hash failed", e as string));
+
 	if (!hashedPassword.outcome.success)
 		return {
 			"500": {
@@ -66,6 +67,7 @@ const createUser = action(async ({ body }, log: Logger) => {
 				.returning(),
 		)
 	)
+		.onError((e) => log.error("create user query failed", e as string))
 		.one()
 		.mapError((e) => (e === NoRows ? "conflict" : e));
 
@@ -74,7 +76,7 @@ const createUser = action(async ({ body }, log: Logger) => {
 			return {
 				"409": "Email is already registered",
 			};
-		log.error("server error", q.outcome.error as string);
+
 		return {
 			"500": {
 				error: "Internal Server Error - Failed to create user",

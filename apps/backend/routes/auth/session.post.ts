@@ -62,6 +62,7 @@ const createSession = action(async ({ body, header }, log: Logger) => {
 			db.select().from(userTable).where(eq(userTable.email, body.email)),
 		)
 	)
+		.onError((e) => log.error("check user existence query failed", e as string))
 		.one()
 		.mapError((e) => (e == NoRows ? "no user" : e));
 
@@ -70,7 +71,6 @@ const createSession = action(async ({ body, header }, log: Logger) => {
 			return {
 				"404": "User with this email address does not exist",
 			};
-		log.error("server error", q.outcome.error as string);
 		return {
 			"500": {
 				error: "Internal Server Error - Failed to check user existence",
@@ -84,18 +84,17 @@ const createSession = action(async ({ body, header }, log: Logger) => {
 	log.debug("useful to know", { user, failedAttempts });
 
 	log.debug("op", "password verification");
-	const verify = await Result.tryCatch(() =>
-		argon2.verify(password, body.password),
-	);
-	if (!verify.outcome.success) {
-		log.error("server error", verify.outcome.error);
+	const verify = (
+		await Result.tryCatch(() => argon2.verify(password, body.password))
+	).onError((e) => log.error("password verification failed", e as string));
+
+	if (!verify.outcome.success)
 		return {
 			"500": {
 				error: "Internal Server Error - Failed to verify password",
 				"request-id": log.id,
 			},
 		};
-	}
 
 	if (!verify.outcome.data) {
 		log.debug("op", "incrementing past failed attempts count");
@@ -115,26 +114,26 @@ const createSession = action(async ({ body, header }, log: Logger) => {
 	const tokenHash = createHash("sha256").update(token).digest("hex");
 
 	log.debug("op", "create session");
-	const q2 = await Result.tryCatch(async () => {
-		await db.transaction(async (tx) => {
-			await tx
-				.insert(sessionTable)
-				.values({ token: tokenHash, user, userAgent: header["user-agent"] });
-			await tx
-				.update(userTable)
-				.set({ pastFailedAttempts: 0 })
-				.where(eq(userTable.id, user));
-		});
-	});
-	if (!q2.outcome.success) {
-		log.error("server error", q2.outcome.error as string);
+	const q2 = (
+		await Result.tryCatch(async () => {
+			await db.transaction(async (tx) => {
+				await tx
+					.insert(sessionTable)
+					.values({ token: tokenHash, user, userAgent: header["user-agent"] });
+				await tx
+					.update(userTable)
+					.set({ pastFailedAttempts: 0 })
+					.where(eq(userTable.id, user));
+			});
+		})
+	).onError((e) => log.error("create session query failed", e as string));
+	if (!q2.outcome.success)
 		return {
 			"500": {
 				error: "Internal Server Error - Failed to create user session",
 				"request-id": log.id,
 			},
 		};
-	}
 
 	return { "201": token };
 });
