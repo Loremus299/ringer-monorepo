@@ -10,10 +10,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateSessionBody, createSessionBody } from "@ringer/schemas";
 import { Eye, EyeClosed, UserIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function LoginForm() {
+	const router = useRouter();
 	const [showPassword, setShowPassword] = useState(false);
 	const form = useForm({
 		resolver: zodResolver(createSessionBody),
@@ -42,6 +44,8 @@ export default function LoginForm() {
 				goto: "/auth/register",
 				buttonName: "Register",
 			});
+
+		router.push("/dashboard");
 	};
 
 	return (

@@ -81,7 +81,7 @@ export default function RegisterForm() {
 			});
 		}
 
-		return router.push("/");
+		return router.push("/dashboard");
 	};
 
 	return (
